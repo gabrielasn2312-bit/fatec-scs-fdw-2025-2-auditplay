@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuditPlay - Menu Inicial</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="menu-container">
+    <h1 class="menu-logo">AuditPlay</h1>
+    <p class="menu-subtitle">Bem-vindo! O que deseja fazer?</p>
+
+    <div class="menu-grid">
+
+      <a href="auditoria_organizacional.html" class="menu-box organizacional">
+        <span>Organizacionais</span>
+      </a>
+
+      <a href="auditoria_pessoas.html" class="menu-box pessoas">
+        <span>Pessoas</span>
+      </a>
+
+      <a href="auditoria_fisicos.html" class="menu-box fisicos">
+        <span>Físicos</span>
+      </a>
+
+      <a href="auditoria_tecnologicos.html" class="menu-box tecnologicos">
+        <span>Tecnológicos</span>
+      </a>
+
+    </div>
+
+    <div class="menu-actions">
+      <!-- para auditores: mostrar apenas estes dois botões (visíveis via JS) -->
+      <a href="auditor_pendentes.html" id="link-auditor-pendentes" class="menu-button-secondary" style="display:none;">
+        Auditorias Pendentes
+      </a>
+      <a href="auditorias_feitas.html" id="link-auditor-feitas" class="menu-button-secondary" style="display:none;">
+        Auditorias Feitas
+      </a>
+
+      <!-- para auditados: progresso -->
+      <a href="progresso.html" id="link-progresso" class="menu-button-primary" style="display:none;">
+        Progresso
+      </a>
+    </div>
+  </div>
+  <script src="js/main.js"></script>
+</body>
+</html>

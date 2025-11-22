@@ -1,0 +1,226 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #4b2e83, #ff7f50);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ap-container {
+  width: 100%;
+  max-width: 420px;
+  padding: 16px;
+}
+
+.ap-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px 24px 28px;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.12);
+}
+
+.ap-logo {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #4b2e83;
+  margin-bottom: 4px;
+}
+
+.ap-subtitle {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.ap-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  background: #f5f5f5;
+  padding: 4px;
+  border-radius: 999px;
+}
+
+.ap-tab-button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.ap-tab-button.active {
+  background: #4b2e83;
+  color: #fff;
+  font-weight: 600;
+}
+
+.ap-form {
+  display: none;
+}
+
+.ap-form.active {
+  display: block;
+}
+
+.ap-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.ap-field label {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  color: #444;
+}
+
+.ap-field input {
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.ap-field input:focus {
+  border-color: #4b2e83;
+  box-shadow: 0 0 0 1px rgba(75, 46, 131, 0.3);
+}
+
+.ap-button-primary {
+  width: 100%;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #4b2e83;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.1s;
+}
+
+.ap-button-primary:hover {
+  filter: brightness(1.05);
+}
+
+.ap-button-primary:active {
+  transform: scale(0.98);
+}
+
+.ap-footer {
+  margin-top: 10px;
+  text-align: center;
+  color: #fefefe;
+  font-size: 0.8rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+/* utility: texto com a cor primária azul usada no projeto */
+.ap-text-primary {
+  color: #4b2e83;
+  font-weight: 600;
+}
+/* ===============================
+   MENU INICIAL
+=================================*/
+
+.menu-container {
+  max-width: 520px;
+  width: 100%;
+  background: #ffffffdd;
+  margin: 40px auto;
+  padding: 30px 26px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.menu-logo {
+  text-align: center;
+  color: #4b2e83;
+  margin-bottom: 5px;
+  font-size: 1.9rem;
+  font-weight: 700;
+}
+
+.menu-subtitle {
+  text-align: center;
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 24px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 25px;
+}
+
+.menu-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 95px;
+  border-radius: 14px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: transform .15s ease, filter .2s ease;
+}
+
+/* Cores dos botões */
+.organizacional { background: #EE3A8C; }
+.pessoas        { background: #00FFFF; color: #000; font-weight: 700; }
+.fisicos        { background: #FFF68F; color: #000; font-weight: 700; }
+.tecnologicos   { background: #FFA54F; }
+
+/* Hover */
+.menu-box:hover {
+  filter: brightness(1.05);
+  transform: scale(1.03);
+}
+
+/* Ações inferiores */
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.menu-button-primary,
+.menu-button-secondary {
+  text-align: center;
+  padding: 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.menu-button-primary {
+  background: #4b2e83;
+  color: #fff;
+}
+
+.menu-button-secondary {
+  background: #ddd;
+  color: #333;
+}

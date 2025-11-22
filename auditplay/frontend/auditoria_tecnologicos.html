@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuditPlay - Auditoria Tecnológicos</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="menu-container">
+    <h1 class="menu-logo">AuditPlay</h1>
+    <p class="menu-subtitle">Auditoria — Tecnológicos</p>
+
+    <section>
+      <h2 style="margin-bottom:10px;">Checklist ISO/IEC 27002 — Tecnológicos</h2>
+      <p style="color:#444;margin-bottom:12px;">Responda cada item abaixo selecionando a opção correspondente e forneça uma justificativa quando necessário.</p>
+
+  <div id="audit-status"></div>
+  <form id="audit-form">
+        <div class="question" data-key="gestao_patches" style="margin-bottom:14px;">
+          <label><strong>1. Existe processo formal de gestão de patches e atualizações para sistemas críticos?</strong></label>
+          <div style="margin:6px 0;">
+            <label><input type="radio" name="gestao_patches" value="conforme"> Conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="gestao_patches" value="nao_conforme"> Não conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="gestao_patches" value="nao_possui"> Não possui</label>
+          </div>
+          <textarea placeholder="Justificativa / evidências (opcional)" rows="3" style="width:100%;border-radius:8px;padding:8px;border:1px solid #ccc;"></textarea>
+        </div>
+
+        <div class="question" data-key="controle_acesso_logico" style="margin-bottom:14px;">
+          <label><strong>2. Controle de acesso lógico (autenticação, senhas, MFA) está implementado e documentado?</strong></label>
+          <div style="margin:6px 0;">
+            <label><input type="radio" name="controle_acesso_logico" value="conforme"> Conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="controle_acesso_logico" value="nao_conforme"> Não conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="controle_acesso_logico" value="nao_possui"> Não possui</label>
+          </div>
+          <textarea placeholder="Justificativa / evidências (opcional)" rows="3" style="width:100%;border-radius:8px;padding:8px;border:1px solid #ccc;"></textarea>
+        </div>
+
+        <div class="question" data-key="backup_recuperacao" style="margin-bottom:14px;">
+          <label><strong>3. Existem procedimentos de backup e recuperação testados regularmente?</strong></label>
+          <div style="margin:6px 0;">
+            <label><input type="radio" name="backup_recuperacao" value="conforme"> Conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="backup_recuperacao" value="nao_conforme"> Não conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="backup_recuperacao" value="nao_possui"> Não possui</label>
+          </div>
+          <textarea placeholder="Justificativa / evidências (opcional)" rows="3" style="width:100%;border-radius:8px;padding:8px;border:1px solid #ccc;"></textarea>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <button type="submit" class="menu-button-primary">Salvar respostas</button>
+          <a href="menu.html" class="menu-button-secondary">Voltar ao Menu</a>
+        </div>
+      </form>
+    </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const form = document.getElementById('audit-form');
+  const storageKey = 'audit_tecnologicos';
+  const API_BASE = 'http://localhost:3000/api';
+
+  function getCurrentUser(){ try { return JSON.parse(localStorage.getItem('ap_user')||'null'); } catch(e){ return null; } }
+
+      function populate(obj){
+        form.querySelectorAll('.question').forEach(q => {
+          const key = q.dataset.key;
+          if (obj && obj[key]){
+            const val = obj[key].answer;
+            if (val) {
+              const radio = q.querySelector('input[type=radio][value="'+val+'"]');
+              if (radio) radio.checked = true;
+            }
+            q.querySelector('textarea').value = obj[key].justification || '';
+          }
+        });
+      }
+
+      function setCompleted(){
+        document.getElementById('audit-status').innerHTML = '<div style="background:#16a34a;color:#fff;padding:14px 18px;border-radius:10px;font-weight:700;margin-bottom:18px;text-align:center;">Auditoria já concluída para este usuário.</div>' +
+          '<div style="margin-top:18px;text-align:center;"><a href="menu.html" class="menu-button-secondary">Voltar ao Menu</a></div>';
+        form.style.display = 'none';
+      }
+
+      (async function load(){
+        const user = getCurrentUser();
+        let completed = false;
+        if (user && user.id) {
+          try {
+            const statusResp = await fetch(`${API_BASE}/categories?userId=${user.id}`);
+            const statusJson = await statusResp.json();
+            if (statusJson && statusJson.data && statusJson.data.tecnologicos && statusJson.data.tecnologicos.status === 'respondida') {
+              completed = true;
+            }
+          } catch(e){}
+        }
+        if (completed) {
+          setCompleted();
+          return;
+        }
+        if (user && user.id) {
+          fetch(`${API_BASE}/user_audits/tecnologicos/${user.id}`).then(r => r.json()).then(json => {
+            if (json && json.data) { populate(json.data); return; }
+            return fetch(`${API_BASE}/audits/tecnologicos`);
+          }).then(r2 => r2 && r2.json()).then(j2 => { if (j2 && j2.data) populate(j2.data); }).catch(()=>{
+            const saved = localStorage.getItem(storageKey); if (saved) try{ populate(JSON.parse(saved)); }catch(e){}
+          });
+        } else {
+          fetch(`${API_BASE}/audits/tecnologicos`).then(r => r.json()).then(json => { if (json && json.data) { populate(json.data); return; } }).catch(()=>{ const saved = localStorage.getItem(storageKey); if (saved) try{ populate(JSON.parse(saved)); }catch(e){} });
+        }
+      })();
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        const data = {};
+        form.querySelectorAll('.question').forEach(q => {
+          const key = q.dataset.key;
+          const selected = q.querySelector('input[type=radio]:checked');
+          const justification = q.querySelector('textarea').value;
+          data[key] = { answer: selected ? selected.value : null, justification };
+        });
+
+        const user = getCurrentUser();
+        if (!user || !user.id) {
+          fetch(`${API_BASE}/audits/tecnologicos`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data }) })
+            .then(r => r.json()).then(res => {
+              if (res && res.ok) {
+                const ret = new URLSearchParams(window.location.search).get('return');
+                alert('Respostas salvas no servidor.');
+                if (ret) window.location.href = ret;
+              } else throw new Error('save-failed');
+            }).catch(()=>{ localStorage.setItem(storageKey, JSON.stringify(data)); alert('Servidor indisponível — respostas salvas localmente.'); });
+          return;
+        }
+        fetch(`${API_BASE}/user_audits/tecnologicos`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, data }) })
+          .then(r => r.json()).then(res => {
+            if (res && res.ok) {
+              const ret = new URLSearchParams(window.location.search).get('return');
+              alert('Respostas salvas no servidor para o seu usuário.');
+              if (ret) window.location.href = ret;
+            } else throw new Error('save-failed');
+          }).catch(()=>{ localStorage.setItem(storageKey, JSON.stringify(data)); alert('Servidor indisponível — respostas salvas localmente no navegador.'); });
+      });
+    });
+  </script>
+  </div>
+</body>
+</html>

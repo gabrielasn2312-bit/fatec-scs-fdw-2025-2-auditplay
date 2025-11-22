@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuditPlay - Auditoria Organizacional</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="menu-container">
+    <h1 class="menu-logo">AuditPlay</h1>
+    <p class="menu-subtitle">Auditoria — Organizacionais</p>
+
+    <section>
+      <h2 style="margin-bottom:10px;">Checklist ISO/IEC 27002 — Organizacional</h2>
+      <p style="color:#444;margin-bottom:12px;">Responda cada item abaixo selecionando a opção correspondente e forneça uma justificativa quando necessário.</p>
+
+  <div id="audit-status"></div>
+  <form id="audit-form">
+        <div class="question" data-key="politica_segurança" style="margin-bottom:14px;">
+          <label><strong>1. Existe uma política de segurança da informação documentada e aprovada?</strong></label>
+          <div style="margin:6px 0;">
+            <label><input type="radio" name="politica_segurança" value="conforme"> Conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="politica_segurança" value="nao_conforme"> Não conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="politica_segurança" value="nao_possui"> Não possui</label>
+          </div>
+          <textarea placeholder="Justificativa / evidências (opcional)" rows="3" style="width:100%;border-radius:8px;padding:8px;border:1px solid #ccc;"></textarea>
+        </div>
+
+        <div class="question" data-key="comite_seguranca" style="margin-bottom:14px;">
+          <label><strong>2. Há um comitê ou responsável formal pela segurança da informação?</strong></label>
+          <div style="margin:6px 0;">
+            <label><input type="radio" name="comite_seguranca" value="conforme"> Conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="comite_seguranca" value="nao_conforme"> Não conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="comite_seguranca" value="nao_possui"> Não possui</label>
+          </div>
+          <textarea placeholder="Justificativa / evidências (opcional)" rows="3" style="width:100%;border-radius:8px;padding:8px;border:1px solid #ccc;"></textarea>
+        </div>
+
+        <div class="question" data-key="classificacao_ativos" style="margin-bottom:14px;">
+          <label><strong>3. Existe política de classificação e tratamento de ativos de informação?</strong></label>
+          <div style="margin:6px 0;">
+            <label><input type="radio" name="classificacao_ativos" value="conforme"> Conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="classificacao_ativos" value="nao_conforme"> Não conforme</label>
+            <label style="margin-left:12px;"><input type="radio" name="classificacao_ativos" value="nao_possui"> Não possui</label>
+          </div>
+          <textarea placeholder="Justificativa / evidências (opcional)" rows="3" style="width:100%;border-radius:8px;padding:8px;border:1px solid #ccc;"></textarea>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <button type="submit" class="menu-button-primary">Salvar respostas</button>
+          <a href="menu.html" class="menu-button-secondary">Voltar ao Menu</a>
+        </div>
+      </form>
+    </section>
+  </div>
+
+      <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const form = document.getElementById('audit-form');
+      const storageKey = 'audit_organizacional';
+      const API_BASE = 'http://localhost:3000/api';
+
+      function getCurrentUser(){
+        try { return JSON.parse(localStorage.getItem('ap_user')||'null'); } catch(e){ return null; }
+      }
+
+      function populate(obj){
+        form.querySelectorAll('.question').forEach(q => {
+          const key = q.dataset.key;
+          if (obj && obj[key]){
+            const val = obj[key].answer;
+            if (val) {
+              const radio = q.querySelector('input[type=radio][value="'+val+'"]');
+              if (radio) radio.checked = true;
+            }
+            q.querySelector('textarea').value = obj[key].justification || '';
+          }
+        });
+      }
+
+      function setCompleted(){
+        document.getElementById('audit-status').innerHTML = '<div style="background:#16a34a;color:#fff;padding:14px 18px;border-radius:10px;font-weight:700;margin-bottom:18px;text-align:center;">Auditoria já concluída para este usuário.</div>' +
+          '<div style="margin-top:18px;text-align:center;"><a href="menu.html" class="menu-button-secondary">Voltar ao Menu</a></div>';
+        form.style.display = 'none';
+      }
+
+      // try fetch from API for the logged user, fallback to global audits endpoint and localStorage
+      (async function load(){
+        const user = getCurrentUser();
+        let completed = false;
+        if (user && user.id) {
+          // checa status da categoria para o usuário
+          try {
+            const statusResp = await fetch(`${API_BASE}/categories?userId=${user.id}`);
+            const statusJson = await statusResp.json();
+            if (statusJson && statusJson.data && statusJson.data.organizacional && statusJson.data.organizacional.status === 'respondida') {
+              completed = true;
+            }
+          } catch(e){}
+        }
+        if (completed) {
+          setCompleted();
+          return;
+        }
+        // carrega respostas existentes normalmente
+        if (user && user.id) {
+          fetch(`${API_BASE}/user_audits/organizacional/${user.id}`).then(r => r.json()).then(json => {
+            if (json && json.data) { populate(json.data); return; }
+            // fallback to old global endpoint
+            return fetch(`${API_BASE}/audits/organizacional`);
+          }).then(r2 => r2 && r2.json()).then(j2 => { if (j2 && j2.data) populate(j2.data); }).catch(()=>{
+            const saved = localStorage.getItem(storageKey);
+            if (saved) try { populate(JSON.parse(saved)); } catch(e){}
+          });
+        } else {
+          // not logged: try global then local
+          fetch(`${API_BASE}/audits/organizacional`).then(r => r.json()).then(json => {
+            if (json && json.data) { populate(json.data); return; }
+          }).catch(()=>{
+            const saved = localStorage.getItem(storageKey);
+            if (saved) try { populate(JSON.parse(saved)); } catch(e){}
+          });
+        }
+      })();
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        const data = {};
+        form.querySelectorAll('.question').forEach(q => {
+          const key = q.dataset.key;
+          const selected = q.querySelector('input[type=radio]:checked');
+          const justification = q.querySelector('textarea').value;
+          data[key] = { answer: selected ? selected.value : null, justification };
+        });
+
+        // try to POST to API for the logged user
+        const user = getCurrentUser();
+        if (!user || !user.id) {
+          // fallback to global endpoint if no user
+          fetch(`${API_BASE}/audits/organizacional`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data })
+          }).then(r => r.json()).then(res => {
+            if (res && res.ok) { alert('Respostas salvas no servidor.'); } else { throw new Error('save-failed'); }
+          }).catch(()=>{ localStorage.setItem(storageKey, JSON.stringify(data)); alert('Servidor indisponível — respostas salvas localmente no navegador.'); });
+          return;
+        }
+
+        fetch(`${API_BASE}/user_audits/organizacional`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id, data })
+        }).then(r => r.json()).then(res => {
+          if (res && res.ok) {
+            const ret = new URLSearchParams(window.location.search).get('return');
+            alert('Respostas salvas no servidor para o seu usuário.');
+            if (ret) window.location.href = ret; else { /* permanecer na página */ }
+          } else {
+            throw new Error('save-failed');
+          }
+        }).catch(()=>{
+          // fallback to localStorage
+          localStorage.setItem(storageKey, JSON.stringify(data));
+          alert('Servidor indisponível — respostas salvas localmente no navegador.');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AuditPlay - Progresso</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="menu-container">
+    <h1 class="menu-logo">AuditPlay</h1>
+    <p class="menu-subtitle">Progresso das Auditorias</p>
+
+    <section style="max-width:800px;margin:0 auto;">
+      <div id="status-list" style="margin-top:12px;"></div>
+
+        <div id="pending-clean" style="margin-top:12px;"></div>
+
+      <div style="margin-top:18px;">
+        <a href="menu.html" class="menu-button-secondary">Voltar ao Menu</a>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const API = 'http://localhost:3000/api';
+    function badge(txt, color){
+      return `<span style="background:${color};color:#fff;padding:6px 10px;border-radius:12px;font-weight:600;font-size:13px;">${txt}</span>`;
+    }
+    function human(cat){
+      switch(cat){
+        case 'organizacional': return 'Organizacionais';
+        case 'pessoas': return 'Pessoas';
+        case 'fisicos': return 'Físicos';
+        case 'tecnologicos': return 'Tecnológicos';
+        default: return cat;
+      }
+    }
+    async function load(){
+      const el = document.getElementById('status-list');
+      el.innerHTML = '<em>Carregando...</em>';
+      // se usuário logado, solicitar status por usuário
+      let url = `${API}/categories`;
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem('ap_user')||'null');
+        if (user && user.id) url = `${API}/categories?userId=${user.id}`;
+      } catch(e) {}
+      try {
+        const json = await (await fetch(url)).json();
+        // esconde a área de status/categorias quando o usuário for auditor
+        if (user && user.perfil === 'auditor') {
+          el.style.display = 'none';
+        } else {
+          el.style.display = 'block';
+        }
+        el.innerHTML = '';
+        if (!json || !json.data) { el.innerHTML = '<div>Erro ao carregar status.</div>'; return; }
+        // se for auditor, aqui mostramos uma lista limpa de auditorias pendentes
+        const clean = document.getElementById('pending-clean');
+        clean.innerHTML = '';
+        if (user && user.perfil === 'auditor') {
+          // Agregar todas as pendências de todas as categorias em uma lista única
+          const categories = Object.keys(json.data);
+          const all = [];
+          for (const cat of categories) {
+            try {
+              const res = await fetch(`${API}/user_audits/pending_for_auditor/${user.id}/${cat}`);
+              const pend = await res.json();
+              if (!pend || !pend.data || pend.data.length === 0) continue;
+              // armazenar a categoria internamente (não exibida) para uso no link
+              pend.data.forEach(u => { u._category = cat; all.push(u); });
+            } catch(e) {
+              // ignorar categoria com erro e continuar
+              continue;
+            }
+          }
+          if (all.length === 0) {
+            clean.innerHTML = '<div>Nenhuma auditoria pendente para você.</div>';
+            return;
+          }
+          const list = document.createElement('div');
+          list.style.display = 'grid';
+          list.style.gap = '8px';
+          // renderizar lista plana (sem cabeçalhos de categoria)
+          all.forEach(u => {
+            const item = document.createElement('div');
+            item.className = 'menu-box';
+            item.style.display = 'flex';
+            item.style.justifyContent = 'space-between';
+            item.style.alignItems = 'center';
+            item.style.padding = '10px';
+            item.innerHTML = `<div style="color:#4b2e83;font-weight:700">${u.name} <br><small style="color:#4b2e83;font-weight:600;">${u.email} ${u.company ? ' - ' + u.company : ''}</small></div>`;
+            const link = document.createElement('a');
+            link.className = 'menu-button-primary';
+            // manter categoria no link, mas não exibir ao usuário
+            link.href = `auditor_pendentes.html?category=${u._category}&userId=${u.user_id}`;
+            link.textContent = 'Avaliar';
+            item.appendChild(link);
+            list.appendChild(item);
+          });
+          clean.appendChild(list);
+          return;
+        }
+
+        // not auditor: mostra progresso normal (por usuário)
+        Object.keys(json.data).forEach(cat => {
+          const info = json.data[cat];
+          const row = document.createElement('div');
+          row.className = 'menu-box';
+          row.style.display = 'flex';
+          row.style.justifyContent = 'space-between';
+          row.style.alignItems = 'center';
+          row.style.margin = '8px 0';
+          const left = document.createElement('div');
+          left.innerHTML = `<strong class="ap-text-primary" style="color:#4b2e83;">${human(cat)}</strong><br><small style="color:#4b2e83;">Última atualização: ${info.updated_at || '-'}.</small>`;
+          const right = document.createElement('div');
+          if (info.status === 'respondida') right.innerHTML = badge('Finalizada', '#16a34a') + ` <a href="auditoria_${cat}.html?return=progresso.html" style="margin-left:8px;" class="menu-button-secondary">Ver</a>`;
+          else right.innerHTML = badge('Pendente', '#dc2626') + ` <a href="auditoria_${cat}.html?return=progresso.html" style="margin-left:8px;" class="menu-button-primary">Responder</a>`;
+          row.appendChild(left);
+          row.appendChild(right);
+          el.appendChild(row);
+        });
+      } catch (e) {
+        el.innerHTML = '<div>Erro ao conectar com o servidor.</div>';
+      }
+    }
+    document.addEventListener('DOMContentLoaded', load);
+  </script>
+</body>
+</html>

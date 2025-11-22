@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AuditPlay - Login / Cadastro</title>
+
+  <!-- Fonte simples do Google (opcional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS próprio -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="ap-container">
+    <div class="ap-card">
+      <h1 class="ap-logo">AuditPlay</h1>
+      <p class="ap-subtitle">Plataforma de Auditoria ISO/IEC 27002</p>
+
+      <!-- Botões de troca de aba -->
+      <div class="ap-tabs">
+        <button class="ap-tab-button active" data-tab="login">Login</button>
+        <button class="ap-tab-button" data-tab="signup">Criar conta</button>
+      </div>
+
+      <!-- Formulário de Login -->
+      <form id="form-login" class="ap-form active">
+        <div class="ap-field">
+          <label for="login-email">E-mail</label>
+          <input type="email" id="login-email" placeholder="seuemail@empresa.com" required>
+        </div>
+
+        <div class="ap-field">
+          <label for="login-senha">Senha</label>
+          <input type="password" id="login-senha" placeholder="Digite sua senha" required>
+        </div>
+
+        <button type="submit" class="ap-button-primary">Entrar</button>
+      </form>
+
+      <!-- Formulário de Cadastro -->
+      <form id="form-signup" class="ap-form">
+        <div class="ap-field">
+          <label for="signup-nome">Nome completo</label>
+          <input type="text" id="signup-nome" placeholder="Seu nome" required>
+        </div>
+
+        <div class="ap-field">
+          <label for="signup-email">E-mail corporativo</label>
+          <input type="email" id="signup-email" placeholder="seuemail@empresa.com" required>
+        </div>
+
+        <div class="ap-field">
+          <label for="signup-empresa">Empresa</label>
+          <input type="text" id="signup-empresa" placeholder="Nome da empresa" required>
+        </div>
+
+        <div class="ap-field">
+          <label for="signup-cargo">Cargo</label>
+          <input type="text" id="signup-cargo" placeholder="Ex: Analista de Segurança" required>
+        </div>
+
+        <div class="ap-field">
+          <label for="signup-perfil">Perfil</label>
+          <select id="signup-perfil" required>
+            <option value="auditado" selected>Auditado</option>
+            <option value="auditor">Auditor</option>
+          </select>
+        </div>
+
+        <div class="ap-field">
+          <label for="signup-senha">Senha</label>
+          <input type="password" id="signup-senha" placeholder="Crie uma senha" required>
+        </div>
+
+        <div class="ap-field">
+          <label for="signup-senha2">Confirme a senha</label>
+          <input type="password" id="signup-senha2" placeholder="Repita a senha" required>
+        </div>
+
+        <button type="submit" class="ap-button-primary">Criar conta</button>
+      </form>
+    </div>
+
+    <footer class="ap-footer">
+      <span>AuditPlay &copy; 2025 - Projeto acadêmico FATEC SCS</span>
+    </footer>
+  </div>
+
+  <!-- JS próprio -->
+  <script src="js/main.js"></script>
+</body>
+</html>

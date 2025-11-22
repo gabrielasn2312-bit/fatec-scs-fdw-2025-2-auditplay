@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuditPlay - Auditorias Pendentes</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="menu-container">
+    <h1 class="menu-logo">AuditPlay</h1>
+    <p class="menu-subtitle">Auditorias Pendentes</p>
+
+    <section>
+      <p style="color:#444;margin-bottom:12px;">Lista de auditorias marcadas como pendentes. Nesta versão MVP, itens são estáticos — futuramente isto pode ser dinâmico via API.</p>
+
+      <div class="menu-grid" style="margin-bottom:18px;">
+        <a href="auditoria_organizacional.html" class="menu-box organizacional" style="flex-direction:column;align-items:center;justify-content:center;">
+          <span>Organizacionais</span>
+          <small id="badge-organizacional" style="margin-top:8px;background:rgba(255, 255, 255, 0.85);color:#333;padding:6px 8px;border-radius:8px;font-weight:700;">Pendente</small>
+        </a>
+
+        <a href="auditoria_pessoas.html" class="menu-box pessoas" style="flex-direction:column;align-items:center;justify-content:center;">
+          <span>Pessoas</span>
+          <small id="badge-pessoas" style="margin-top:8px;background:rgba(255,255,255,0.85);color:#000;padding:6px 8px;border-radius:8px;font-weight:700;">Pendente</small>
+        </a>
+
+        <a href="auditoria_fisicos.html" class="menu-box fisicos" style="flex-direction:column;align-items:center;justify-content:center;">
+          <span>Físicos</span>
+          <small id="badge-fisicos" style="margin-top:8px;background:rgba(0,0,0,0.06);color:#000;padding:6px 8px;border-radius:8px;font-weight:700;">Pendente</small>
+        </a>
+
+        <a href="auditoria_tecnologicos.html" class="menu-box tecnologicos" style="flex-direction:column;align-items:center;justify-content:center;">
+          <span>Tecnológicos</span>
+          <small id="badge-tecnologicos" style="margin-top:8px;background:rgba(255,255,255,0.85);color:#333;padding:6px 8px;border-radius:8px;font-weight:700;">Pendente</small>
+        </a>
+      </div>
+
+      <div style="display:flex;gap:12px;">
+        <a href="menu.html" class="menu-button-secondary">Voltar ao Menu</a>
+        <a href="dashboard.html" class="menu-button-primary">Ir para Dashboard</a>
+        <button id="btn-reset" class="menu-button-secondary" style="margin-left:auto;">Zerar auditorias</button>
+      </div>
+    </section>
+    <script>
+      function atualizarBadges() {
+        const API = 'http://localhost:3000/api/categories';
+        fetch(API).then(r => r.json()).then(json => {
+          if (!json || !json.data) return;
+          const map = json.data;
+          const ids = { organizacional: 'badge-organizacional', pessoas: 'badge-pessoas', fisicos: 'badge-fisicos', tecnologicos: 'badge-tecnologicos' };
+          Object.keys(ids).forEach(cat => {
+            const el = document.getElementById(ids[cat]);
+            if (!el) return;
+            const info = map[cat];
+            if (!info) {
+              el.textContent = 'Pendente';
+              return;
+            }
+            const status = info.status || 'pendente';
+            if (status === 'respondida') {
+              el.textContent = 'Respondida';
+              el.style.background = 'rgba(233, 255, 235, 0.95)';
+              el.style.color = '#2b8a3e';
+            } else {
+              el.textContent = 'Pendente';
+              el.style.background = 'rgba(255,255,255,0.85)';
+              el.style.color = '#333';
+            }
+          });
+        }).catch(()=>{/* backend indisponível - manter estado */});
+      }
+      atualizarBadges();
+
+      document.getElementById('btn-reset').onclick = function(){
+        fetch('http://localhost:3000/api/categories/resetAll', { method: 'POST' })
+          .then(r => r.json()).then(res => {
+            if (res && res.ok) {
+              atualizarBadges();
+              alert('Status das auditorias zerado!');
+            } else {
+              alert('Falha ao zerar status.');
+            }
+          }).catch(()=>alert('Erro ao conectar com backend.'));
+      };
+    </script>
+  </div>
+</body>
+</html>

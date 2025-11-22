@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auditorias Feitas</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="menu-container">
+    <h1 class="menu-logo">AuditPlay - Auditorias Feitas</h1>
+    <p class="menu-subtitle">Auditorias que você avaliou</p>
+
+    <section style="max-width:900px;margin:0 auto;">
+      <div id="done-list">Carregando...</div>
+      <div style="margin-top:18px;">
+        <a href="menu.html" class="menu-button-secondary">Voltar ao Menu</a>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const API = 'http://localhost:3000/api';
+    async function load(){
+      const out = document.getElementById('done-list');
+      const user = JSON.parse(localStorage.getItem('ap_user')||'null');
+      if (!user) { out.innerHTML = '<div>Faça login como auditor.</div>'; return; }
+      // obter avaliações feitas pelo auditor
+      try {
+        const res = await fetch(`${API}/evaluations?auditorId=${user.id}`);
+        const j = await res.json();
+        if (!j || !j.data) { out.innerHTML = '<div>Nenhuma avaliação encontrada.</div>'; return; }
+        out.innerHTML = '';
+        j.data.forEach(ev => {
+          const d = document.createElement('div');
+          d.className = 'menu-box';
+          d.innerHTML = `<strong>${ev.key || ('Resposta #' + ev.user_response_id)}</strong><div>${ev.verdict} — ${ev.comment || ''}</div>`;
+          out.appendChild(d);
+        });
+      } catch(e){ out.innerHTML = '<div>Erro ao carregar.</div>'; }
+    }
+    document.addEventListener('DOMContentLoaded', load);
+  </script>
+</body>
+</html>

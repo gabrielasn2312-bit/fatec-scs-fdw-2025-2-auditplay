@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auditor - Auditorias Pendentes</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="menu-container">
+    <h1 class="menu-logo">AuditPlay - Área do Auditor</h1>
+    <p class="menu-subtitle">Auditorias pendentes para avaliação</p>
+
+    <div style="max-width:900px;margin:0 auto;">
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:8px;">
+        <a href="menu.html" class="menu-button-secondary">Menu</a>
+      </div>
+      <div class="ap-field">
+        <label for="auditor-category">Categoria</label>
+        <select id="auditor-category">
+          <option value="organizacional">Organizacional</option>
+          <option value="pessoas">Pessoas</option>
+          <option value="fisicos">Físicos</option>
+          <option value="tecnologicos">Tecnológicos</option>
+        </select>
+      </div>
+
+      <div id="pending-list" style="margin-top:20px;"></div>
+
+      <hr />
+
+      <div id="user-audit-area" style="display:none; margin-top:20px;">
+        <h3 id="ua-title"></h3>
+        <div id="ua-list"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/auditor.js"></script>
+</body>
+</html>

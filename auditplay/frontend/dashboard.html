@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuditPlay - Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="menu-container">
+    <h1 class="menu-logo">AuditPlay</h1>
+    <p class="menu-subtitle">Dashboard — Visão Geral</p>
+
+    <section>
+      <h3>Resumo rápido</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 18px;">
+        <div style="background:#fff;padding:12px;border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,0.06);">
+          <strong>Auditorias pendentes</strong>
+          <p id="pendentes-count" style="margin-top:8px;color:#333;">...</p>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,0.06);">
+          <strong>Completadas (MVP)</strong>
+          <p id="completadas-count" style="margin-top:8px;color:#333;">...</p>
+        </div>
+      </div>
+
+      <h3>Atalhos</h3>
+      <div class="menu-grid" style="margin-top:8px;">
+        <a href="auditoria_organizacional.html" class="menu-box organizacional">Organizacionais</a>
+        <a href="auditoria_pessoas.html" class="menu-box pessoas">Pessoas</a>
+        <a href="auditoria_fisicos.html" class="menu-box fisicos">Físicos</a>
+        <a href="auditoria_tecnologicos.html" class="menu-box tecnologicos">Tecnológicos</a>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:12px;">
+        <a href="menu.html" class="menu-button-secondary">Voltar ao Menu</a>
+        <a href="auditorias_pendentes.html" class="menu-button-primary">Ver Pendentes</a>
+      </div>
+    </section>
+  </div>
+  <script>
+    // Atualiza os números do dashboard com base no backend
+    function atualizarDashboard() {
+      fetch('http://localhost:3000/api/categories')
+        .then(r => r.json())
+        .then(json => {
+          if (!json || !json.data) return;
+          let pendentes = 0, completadas = 0;
+          Object.values(json.data).forEach(cat => {
+            if (cat.status === 'respondida') completadas++;
+            else pendentes++;
+          });
+          document.getElementById('pendentes-count').textContent = pendentes;
+          document.getElementById('completadas-count').textContent = completadas;
+        })
+        .catch(()=>{
+          document.getElementById('pendentes-count').textContent = '?';
+          document.getElementById('completadas-count').textContent = '?';
+        });
+    }
+    atualizarDashboard();
+  </script>
+</body>
+</html>
